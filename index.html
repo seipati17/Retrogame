@@ -1,755 +1,838 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Campfire Retro Adventure</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    <style>
-        :root {
-            --night-bg: #0f172a;
-            --panel-bg: #1e293b;
-            --fire-orange: #f97316;
-            --fire-glow: #fbbf24;
-            --text-main: #f1f5f9;
-            --text-muted: #94a3b8;
-            --success: #22c55e;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Campfire Retro Adventure</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<style>
+:root {
+--night-bg: #0f172a;
+--panel-bg: #1e293b;
+--fire-orange: #f97316;
+--fire-glow: #fbbf24;
+--text-main: #f1f5f9;
+--text-muted: #94a3b8;
+--success: #22c55e;
+}
 
-        * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+* { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
 
-        body {
-            margin: 0;
-            background-color: var(--night-bg);
-            color: var(--text-main);
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            overflow-x: hidden;
-        }
+body {
+margin: 0;
+background-color: var(--night-bg);
+color: var(--text-main);
+min-height: 100vh;
+display: flex;
+flex-direction: column;
+overflow-x: hidden;
+}
 
-        .hidden { display: none !important; }
-        
-        .btn {
-            padding: 12px 24px;
-            border-radius: 8px;
-            border: none;
-            font-weight: bold;
-            cursor: pointer;
-            transition: transform 0.2s;
-            font-size: 1rem;
-        }
-        .btn:hover { transform: scale(1.02); }
-        .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
-        .btn-primary { background: linear-gradient(135deg, var(--fire-orange), #dc2626); color: white; }
-        .btn-secondary { background: #334155; color: white; }
-        .btn-lock { background: var(--success); color: #052e16; }
+.hidden { display: none !important; }
+.btn {
+padding: 12px 24px;
+border-radius: 8px;
+border: none;
+font-weight: bold;
+cursor: pointer;
+transition: transform 0.2s;
+font-size: 1rem;
+}
+.btn:hover { transform: scale(1.02); }
+.btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+.btn-primary { background: linear-gradient(135deg, var(--fire-orange), #dc2626); color: white; }
+.btn-secondary { background: #334155; color: white; }
+.btn-lock { background: var(--success); color: #052e16; }
 
-        .container { max-width: 1400px; margin: 0 auto; padding: 20px; width: 100%; }
+.container { max-width: 1400px; margin: 0 auto; padding: 20px; width: 100%; }
 
-        /* Screens */
-        .screen {
-            animation: fadeIn 0.5s ease-in-out;
-            width: 100%;
-            flex-grow: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
+/* Screens */
+.screen {
+animation: fadeIn 0.5s ease-in-out;
+width: 100%;
+flex-grow: 1;
+display: flex;
+flex-direction: column;
+align-items: center;
+}
 
-        #login-screen {
-            justify-content: center;
-            background: radial-gradient(circle at center bottom, #2d1b14 0%, var(--night-bg) 70%);
-        }
-        .login-card {
-            background: rgba(30, 41, 59, 0.9);
-            padding: 40px;
-            border-radius: 16px;
-            border: 1px solid rgba(249, 115, 22, 0.3);
-            box-shadow: 0 0 40px rgba(249, 115, 22, 0.2);
-            text-align: center;
-            backdrop-filter: blur(10px);
-        }
-        .login-input {
-            width: 100%;
-            padding: 12px;
-            margin: 20px 0;
-            border-radius: 6px;
-            border: 1px solid #475569;
-            background: #0f172a;
-            color: white;
-            font-size: 1rem;
-        }
+#login-screen {
+justify-content: center;
+background: radial-gradient(circle at center bottom, #2d1b14 0%, var(--night-bg) 70%);
+}
+.login-card {
+background: rgba(30, 41, 59, 0.9);
+padding: 40px;
+border-radius: 16px;
+border: 1px solid rgba(249, 115, 22, 0.3);
+box-shadow: 0 0 40px rgba(249, 115, 22, 0.2);
+text-align: center;
+backdrop-filter: blur(10px);
+}
+.login-input {
+width: 100%;
+padding: 12px;
+margin: 20px 0;
+border-radius: 6px;
+border: 1px solid #475569;
+background: #0f172a;
+color: white;
+font-size: 1rem;
+}
 
-        /* Layouts */
-        .header-bar {
-            width: 100%;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 15px 30px;
-            background: rgba(0,0,0,0.3);
-            border-bottom: 1px solid #334155;
-        }
-        .grid-layout {
-            display: grid;
-            grid-template-columns: 1.2fr 0.8fr;
-            gap: 30px;
-            margin-top: 20px;
-            width: 100%;
-            max-width: 1200px;
-        }
-        .panel {
-            background: var(--panel-bg);
-            padding: 30px;
-            border-radius: 16px;
-            border: 1px solid #334155;
-            position: relative;
-        }
+/* Layouts */
+.header-bar {
+width: 100%;
+display: flex;
+justify-content: space-between;
+align-items: center;
+padding: 15px 30px;
+background: rgba(0,0,0,0.3);
+border-bottom: 1px solid #334155;
+}
+.grid-layout {
+display: grid;
+grid-template-columns: 1.2fr 0.8fr;
+gap: 30px;
+margin-top: 20px;
+width: 100%;
+max-width: 1200px;
+}
+.panel {
+background: var(--panel-bg);
+padding: 30px;
+border-radius: 16px;
+border: 1px solid #334155;
+position: relative;
+}
 
-        /* Wheel */
-        .wheel-container {
-            width: 120px;
-            height: 120px;
-            border-radius: 50%;
-            border: 8px solid var(--fire-orange);
-            border-top-color: var(--fire-glow);
-            margin: 0 auto 20px;
-            position: relative;
-        }
-        .spinning { animation: spin 0.8s linear infinite; }
+/* Wheel */
+.wheel-container {
+width: 120px;
+height: 120px;
+border-radius: 50%;
+border: 8px solid var(--fire-orange);
+border-top-color: var(--fire-glow);
+margin: 0 auto 20px;
+position: relative;
+}
+.spinning { animation: spin 0.8s linear infinite; }
 
-        /* Question Card */
-        .question-card {
-            background: #273549;
-            padding: 20px;
-            border-radius: 10px;
-            margin: 20px 0;
-            border: 1px solid var(--fire-orange);
-            min-height: 100px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-            font-size: 1.3rem;
-            font-weight: bold;
-            color: var(--fire-glow);
-        }
+/* Question Card */
+.question-card {
+background: #273549;
+padding: 20px;
+border-radius: 10px;
+margin: 20px 0;
+border: 1px solid var(--fire-orange);
+min-height: 100px;
+display: flex;
+flex-direction: column;
+align-items: center;
+justify-content: center;
+text-align: center;
+box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+font-size: 1.3rem;
+font-weight: bold;
+color: var(--fire-glow);
+}
 
-        /* Retro Board */
-        .retro-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
-            width: 100%;
-            margin-top: 20px;
-        }
-        .retro-col {
-            background: rgba(30, 41, 59, 0.6);
-            border: 1px solid #334155;
-            border-radius: 12px;
-            padding: 15px;
-            min-height: 350px;
-            display: flex;
-            flex-direction: column;
-        }
-        .col-header {
-            margin-bottom: 15px;
-            border-bottom: 1px solid #475569;
-            padding-bottom: 10px;
-        }
-        .col-title {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-weight: bold;
-            font-size: 1.1rem;
-        }
-        .col-desc {
-            font-size: 0.8rem;
-            color: var(--text-muted);
-            margin-top: 4px;
-            font-style: italic;
-            line-height: 1.4;
-        }
-        
-        .sticky-note {
-            background: #fef08a;
-            color: #1e293b;
-            padding: 15px;
-            margin-bottom: 10px;
-            border-radius: 4px;
-            box-shadow: 2px 2px 5px rgba(0,0,0,0.2);
-            font-family: 'Comic Sans MS', cursive, sans-serif;
-            font-size: 0.9rem;
-            animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            position: relative;
-        }
-        .sticky-note::after {
-            content: attr(data-author);
-            display: block;
-            text-align: right;
-            font-size: 0.7rem;
-            color: #64748b;
-            margin-top: 5px;
-        }
+/* Retro Board */
+.retro-grid {
+display: grid;
+grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+gap: 20px;
+width: 100%;
+margin-top: 20px;
+}
+.retro-col {
+background: rgba(30, 41, 59, 0.6);
+border: 1px solid #334155;
+border-radius: 12px;
+padding: 15px;
+min-height: 350px;
+display: flex;
+flex-direction: column;
+}
+.col-header {
+margin-bottom: 15px;
+border-bottom: 1px solid #475569;
+padding-bottom: 10px;
+}
+.col-title {
+display: flex;
+align-items: center;
+gap: 10px;
+font-weight: bold;
+font-size: 1.1rem;
+}
+.col-desc {
+font-size: 0.8rem;
+color: var(--text-muted);
+margin-top: 4px;
+font-style: italic;
+line-height: 1.4;
+}
+.sticky-note {
+background: #fef08a;
+color: #1e293b;
+padding: 15px;
+margin-bottom: 10px;
+border-radius: 4px;
+box-shadow: 2px 2px 5px rgba(0,0,0,0.2);
+font-family: 'Comic Sans MS', cursive, sans-serif;
+font-size: 0.9rem;
+animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+position: relative;
+}
+.sticky-note::after {
+content: attr(data-author);
+display: block;
+text-align: right;
+font-size: 0.7rem;
+color: #64748b;
+margin-top: 5px;
+}
 
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        @keyframes popIn { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-        @keyframes fireFlicker { 0%, 100% { opacity: 1; } 50% { opacity: 0.8; } }
+@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes popIn { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+@keyframes fireFlicker { 0%, 100% { opacity: 1; } 50% { opacity: 0.8; } }
 
-        .fire-icon { font-size: 3rem; animation: fireFlicker 1.5s infinite alternate; display: block; margin: 0 auto 10px; }
+.fire-icon { font-size: 3rem; animation: fireFlicker 1.5s infinite alternate; display: block; margin: 0 auto 10px; }
 
-        @media (max-width: 768px) { .grid-layout { grid-template-columns: 1fr; } }
-    </style>
+@media (max-width: 768px) { .grid-layout { grid-template-columns: 1fr; } }
+</style>
 </head>
 <body>
 
-    <div id="login-screen" class="screen">
-        <div class="login-card">
-            <div class="fire-icon">🔥</div>
-            <h1>Campfire Retro</h1>
-            <p style="color: var(--text-muted)">Join the team circle.</p>
-            <form id="login-form">
-                <input type="text" id="username-input" class="login-input" placeholder="Enter Avatar Name..." required autocomplete="off">
-                <button type="submit" class="btn btn-primary" style="width: 100%">Join the Camp</button>
-            </form>
-            
-        
-        </div>
-    </div>
+<div id="login-screen" class="screen">
+<div class="login-card">
+<div class="fire-icon">🔥</div>
+<h1>Campfire Retro</h1>
+<p style="color: var(--text-muted)">Join the team circle.</p>
+<form id="login-form">
+<input type="text" id="username-input" class="login-input" placeholder="Enter Avatar Name..." required autocomplete="off">
+<button type="submit" class="btn btn-primary" style="width: 100%">Join the Camp</button>
+</form>
+</div>
+</div>
 
-    <div id="icebreaker-screen" class="screen hidden">
-        <div class="header-bar">
-            <div>
-                <span id="display-name" style="font-weight: bold;"></span>
-                <span id="display-role" style="font-size: 0.8rem; background: #334155; padding: 2px 8px; border-radius: 10px; margin-left: 10px;"></span>
-            </div>
-            <button id="download-btn-ice" class="btn btn-secondary hidden" onclick="downloadView('admin-panel-content')">📸 Download List</button>
-        </div>
+<div id="icebreaker-screen" class="screen hidden">
+<div class="header-bar">
+<div>
+<span id="display-name" style="font-weight: bold;"></span>
+<span id="display-role" style="font-size: 0.8rem; background: #334155; padding: 2px 8px; border-radius: 10px; margin-left: 10px;"></span>
+</div>
+<button id="download-btn-ice" class="btn btn-secondary hidden" onclick="downloadView('admin-panel-content')">📸 Download List</button>
+</div>
 
-        <div class="container">
-            <div class="grid-layout">
-                <div class="panel" style="text-align: center;">
-                    <h2 style="margin-top:0;">🎲 Spin for a Log</h2>
-                    <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 20px;">
-                        Spin to get your topic and Lock it in/
-                    </p>
-                    
-                    <div id="wheel-visual" class="wheel-container">
-                        <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 2rem;">?</div>
-                    </div>
+<div class="container">
+<div class="grid-layout">
+<div class="panel" style="text-align: center;">
+<h2 style="margin-top:0;">🎲 Spin for a Log</h2>
+<p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 20px;">
+Spin to get your topic and Lock it in/
+</p>
+<div id="wheel-visual" class="wheel-container">
+<div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 2rem;">?</div>
+</div>
 
-                    <div id="question-display" class="question-card hidden">
-                        </div>
+<div id="question-display" class="question-card hidden">
+</div>
 
-                    <div id="spin-controls">
-                        <button id="spin-btn" class="btn btn-primary" onclick="spinWheel()">Spin the Wheel</button>
-                    </div>
+<div id="spin-controls">
+<button id="spin-btn" class="btn btn-primary" onclick="spinWheel()">Spin the Wheel</button>
+</div>
 
-                    <div id="lock-section" class="hidden" style="margin-top: 20px;">
-                        <p style="color: #94a3b8; font-style: italic; margin-bottom: 15px;">
-                            Ready to answer this during the circle?
-                        </p>
-                        <button class="btn btn-lock" onclick="lockQuestion()">🔒 Throw Log & Lock Topic</button>
-                    </div>
-                    
-                    <div id="post-lock-msg" class="hidden" style="margin-top: 20px;">
-                        <div style="background: rgba(34, 197, 94, 0.2); padding: 15px; border-radius: 8px; color: #86efac; margin-bottom: 15px;">
-                            <strong>Log Thrown! 🔥</strong><br>
-                            This topic is locked to you.
-                        </div>
-                        <button class="btn btn-secondary" onclick="goToRetro()">Go to Retro Board ➡️</button>
-                    </div>
-                </div>
+<div id="lock-section" class="hidden" style="margin-top: 20px;">
+<p style="color: #94a3b8; font-style: italic; margin-bottom: 15px;">
+Ready to answer this during the circle?
+</p>
+<button class="btn btn-lock" onclick="lockQuestion()">🔒 Throw Log & Lock Topic</button>
+</div>
+<div id="post-lock-msg" class="hidden" style="margin-top: 20px;">
+<div style="background: rgba(34, 197, 94, 0.2); padding: 15px; border-radius: 8px; color: #86efac; margin-bottom: 15px;">
+<strong>Log Thrown! 🔥</strong><br>
+This topic is locked to you.
+</div>
+<button class="btn btn-secondary" onclick="goToRetro()">Go to Retro Board ➡️</button>
+</div>
+</div>
 
-                <div class="panel" id="admin-panel-content">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                        <h3 style="margin:0;">🏕️ Who has what?</h3>
-                        <div style="font-size: 0.8rem; color: var(--text-muted);">LOCKED</div>
-                    </div>
-                    
-                    <div id="admin-list" style="text-align: left; font-size: 0.9rem; max-height: 400px; overflow-y: auto;">
-                        <p style="color: var(--text-muted); font-style: italic;">Waiting for team...</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+<div class="panel" id="admin-panel-content">
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+<h3 style="margin:0;">🏕️ Who has what?</h3>
+<div style="font-size: 0.8rem; color: var(--text-muted);">LIVE UPDATES</div>
+</div>
+<div id="question-stats" style="margin-bottom: 15px; padding: 10px; background: rgba(249, 115, 22, 0.1); border-radius: 8px; border: 1px solid rgba(249, 115, 22, 0.3);">
+<div style="display: flex; gap: 20px; font-size: 0.9rem; color: var(--text-muted);">
+<span>📝 0 Questions Locked</span>
+<span>👥 0 Participants</span>
+</div>
+</div>
+<div id="admin-list" style="text-align: left; font-size: 0.9rem; max-height: 350px; overflow-y: auto;">
+<p style="color: var(--text-muted); font-style: italic;">Waiting for team...</p>
+</div>
 
-    <div id="retro-screen" class="screen hidden">
-        <div class="header-bar">
-            <h2>🔥 Expedition Recap</h2>
-            <div style="display: flex; gap: 10px;">
-                <button id="download-btn-retro" class="btn btn-secondary hidden" onclick="downloadView('retro-board')">📸 Export Board</button>
-                <button class="btn btn-primary" style="background: #ef4444;" onclick="endSession()">Blow Out Fire</button>
-            </div>
-        </div>
+<div id="all-questions-section" class="hidden" style="margin-top: 20px; padding-top: 15px; border-top: 1px solid #334155;">
+<h4 style="margin: 0 0 10px 0; color: var(--fire-glow);">📋 All Available Questions</h4>
+<div id="all-questions-list" style="font-size: 0.85rem; color: var(--text-muted); max-height: 200px; overflow-y: auto;">
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
 
-        <div class="container" id="retro-board">
-            <div class="retro-grid">
-                <div class="retro-col" id="col-discover">
-                    <div class="col-header">
-                        <div class="col-title"><span>🏕️</span> What Did We Discover?</div>
-                        <div class="col-desc">New learnings, interesting finds, or interesting insights.</div>
-                    </div>
-                    <div class="notes-container" id="notes-discover"></div>
-                    <div style="margin-top: auto; padding-top: 10px;">
-                        <input type="text" class="login-input" style="margin: 0 0 10px 0;" placeholder="Add note..." onkeydown="handleNoteKey(event, 'discover')">
-                        <button class="btn btn-secondary" style="width: 100%; padding: 8px;" onclick="addNoteFromInput('discover')">+ Add</button>
-                    </div>
-                </div>
+<div id="retro-screen" class="screen hidden">
+<div class="header-bar">
+<h2>🔥 Expedition Recap</h2>
+<div style="display: flex; gap: 10px;">
+<button id="download-btn-retro" class="btn btn-secondary hidden" onclick="downloadView('retro-board')">📸 Export Board</button>
+<button class="btn btn-primary" style="background: #ef4444;" onclick="endSession()">Blow Out Fire</button>
+</div>
+</div>
 
-                <div class="retro-col" id="col-highlights">
-                    <div class="col-header">
-                        <div class="col-title"><span>🌟</span> Highlights</div>
-                        <div class="col-desc">Celebrations, wins, and happy moments.</div>
-                    </div>
-                    <div class="notes-container" id="notes-highlights"></div>
-                    <div style="margin-top: auto; padding-top: 10px;">
-                        <input type="text" class="login-input" style="margin: 0 0 10px 0;" placeholder="Add note..." onkeydown="handleNoteKey(event, 'highlights')">
-                        <button class="btn btn-secondary" style="width: 100%; padding: 8px;" onclick="addNoteFromInput('highlights')">+ Add</button>
-                    </div>
-                </div>
+<div class="container" id="retro-board">
+<div id="board-stats" style="margin-bottom: 20px; padding: 15px; background: rgba(34, 197, 94, 0.1); border-radius: 8px; border: 1px solid rgba(34, 197, 94, 0.3); text-align: center;">
+<div style="display: flex; gap: 20px; font-size: 0.9rem; color: var(--text-muted); justify-content: center;">
+<span>📌 0 Total Notes</span>
+<span>✍️ 0 Contributors</span>
+</div>
+</div>
+<div class="retro-grid">
+<div class="retro-col" id="col-discover">
+<div class="col-header">
+<div class="col-title"><span>🏕️</span> What Did We Discover?</div>
+<div class="col-desc">New learnings, interesting finds, or interesting insights.</div>
+</div>
+<div class="notes-container" id="notes-discover"></div>
+<div style="margin-top: auto; padding-top: 10px;">
+<input type="text" class="login-input" style="margin: 0 0 10px 0;" placeholder="Add note..." onkeydown="handleNoteKey(event, 'discover')">
+<button class="btn btn-secondary" style="width: 100%; padding: 8px;" onclick="addNoteFromInput('discover')">+ Add</button>
+</div>
+</div>
 
-                <div class="retro-col" id="col-trip">
-                    <div class="col-header">
-                        <div class="col-title"><span>🪵</span> Tripped Over Log?</div>
-                        <div class="col-desc">Blockers, frustrations, or things that went wrong.</div>
-                    </div>
-                    <div class="notes-container" id="notes-trip"></div>
-                    <div style="margin-top: auto; padding-top: 10px;">
-                        <input type="text" class="login-input" style="margin: 0 0 10px 0;" placeholder="Add note..." onkeydown="handleNoteKey(event, 'trip')">
-                        <button class="btn btn-secondary" style="width: 100%; padding: 8px;" onclick="addNoteFromInput('trip')">+ Add</button>
-                    </div>
-                </div>
+<div class="retro-col" id="col-highlights">
+<div class="col-header">
+<div class="col-title"><span>🌟</span> Highlights</div>
+<div class="col-desc">Celebrations, wins, and happy moments.</div>
+</div>
+<div class="notes-container" id="notes-highlights"></div>
+<div style="margin-top: auto; padding-top: 10px;">
+<input type="text" class="login-input" style="margin: 0 0 10px 0;" placeholder="Add note..." onkeydown="handleNoteKey(event, 'highlights')">
+<button class="btn btn-secondary" style="width: 100%; padding: 8px;" onclick="addNoteFromInput('highlights')">+ Add</button>
+</div>
+</div>
 
-                <div class="retro-col" id="col-mvp">
-                    <div class="col-header">
-                        <div class="col-title"><span>👑</span> Sprint MVP</div>
-                        <div class="col-desc">Nominate a team member who carried the logs this sprint!</div>
-                    </div>
-                    <div class="notes-container" id="notes-mvp"></div>
-                    <div style="margin-top: auto; padding-top: 10px;">
-                        <input type="text" class="login-input" style="margin: 0 0 10px 0;" placeholder="Nominate MVP..." onkeydown="handleNoteKey(event, 'mvp')">
-                        <button class="btn btn-secondary" style="width: 100%; padding: 8px;" onclick="addNoteFromInput('mvp')">+ Add</button>
-                    </div>
-                </div>
+<div class="retro-col" id="col-trip">
+<div class="col-header">
+<div class="col-title"><span>🪵</span> Tripped Over Log?</div>
+<div class="col-desc">Blockers, frustrations, or things that went wrong.</div>
+</div>
+<div class="notes-container" id="notes-trip"></div>
+<div style="margin-top: auto; padding-top: 10px;">
+<input type="text" class="login-input" style="margin: 0 0 10px 0;" placeholder="Add note..." onkeydown="handleNoteKey(event, 'trip')">
+<button class="btn btn-secondary" style="width: 100%; padding: 8px;" onclick="addNoteFromInput('trip')">+ Add</button>
+</div>
+</div>
 
-                <div class="retro-col" id="col-pack">
-                    <div class="col-header">
-                        <div class="col-title"><span>🎒</span> Pack for Next Sprint</div>
-                        <div class="col-desc">Action items, new tools, or process changes.</div>
-                    </div>
-                    <div class="notes-container" id="notes-pack"></div>
-                    <div style="margin-top: auto; padding-top: 10px;">
-                        <input type="text" class="login-input" style="margin: 0 0 10px 0;" placeholder="Add note..." onkeydown="handleNoteKey(event, 'pack')">
-                        <button class="btn btn-secondary" style="width: 100%; padding: 8px;" onclick="addNoteFromInput('pack')">+ Add</button>
-                    </div>
-                </div>
+<div class="retro-col" id="col-mvp">
+<div class="col-header">
+<div class="col-title"><span>👑</span> Sprint MVP</div>
+<div class="col-desc">Nominate a team member who carried the logs this sprint!</div>
+</div>
+<div class="notes-container" id="notes-mvp"></div>
+<div style="margin-top: auto; padding-top: 10px;">
+<input type="text" class="login-input" style="margin: 0 0 10px 0;" placeholder="Nominate MVP..." onkeydown="handleNoteKey(event, 'mvp')">
+<button class="btn btn-secondary" style="width: 100%; padding: 8px;" onclick="addNoteFromInput('mvp')">+ Add</button>
+</div>
+</div>
 
-                 <div class="retro-col" id="col-ask">
-                    <div class="col-header">
-                        <div class="col-title"><span>💬</span> Ask Anything</div>
-                        <div class="col-desc">Open floor: Ask the team or a specific person anything.</div>
-                    </div>
-                    <div class="notes-container" id="notes-ask"></div>
-                    <div style="margin-top: auto; padding-top: 10px;">
-                        <input type="text" class="login-input" style="margin: 0 0 10px 0;" placeholder="Ask anything..." onkeydown="handleNoteKey(event, 'ask')">
-                        <button class="btn btn-secondary" style="width: 100%; padding: 8px;" onclick="addNoteFromInput('ask')">+ Add</button>
-                    </div>
-                </div>
+<div class="retro-col" id="col-pack">
+<div class="col-header">
+<div class="col-title"><span>🎒</span> Pack for Next Sprint</div>
+<div class="col-desc">Action items, new tools, or process changes.</div>
+</div>
+<div class="notes-container" id="notes-pack"></div>
+<div style="margin-top: auto; padding-top: 10px;">
+<input type="text" class="login-input" style="margin: 0 0 10px 0;" placeholder="Add note..." onkeydown="handleNoteKey(event, 'pack')">
+<button class="btn btn-secondary" style="width: 100%; padding: 8px;" onclick="addNoteFromInput('pack')">+ Add</button>
+</div>
+</div>
 
-            </div>
-        </div>
-    </div>
+<div class="retro-col" id="col-ask">
+<div class="col-header">
+<div class="col-title"><span>💬</span> Ask Anything</div>
+<div class="col-desc">Open floor: Ask the team or a specific person anything.</div>
+</div>
+<div class="notes-container" id="notes-ask"></div>
+<div style="margin-top: auto; padding-top: 10px;">
+<input type="text" class="login-input" style="margin: 0 0 10px 0;" placeholder="Ask anything..." onkeydown="handleNoteKey(event, 'ask')">
+<button class="btn btn-secondary" style="width: 100%; padding: 8px;" onclick="addNoteFromInput('ask')">+ Add</button>
+</div>
+</div>
 
-    <div id="end-screen" class="screen hidden" style="justify-content: center; text-align: center;">
-        <div style="font-size: 4rem; opacity: 0.5;">🌑</div>
-        <h1>The Fire is Out</h1>
-        <p>See you next sprint, team.</p>
-        <button class="btn btn-secondary" onclick="location.reload()">Start New Session</button>
-    </div>
+</div>
+</div>
+</div>
 
-    <script>
-        // --- Data ---
-        const ALL_QUESTIONS = [
-            "What’s a small moment this week that warmed your heart?",
-            "If you were to name the last 2 weeks like a book title, what would it be?",
-            "If you could have one superpower just for work, what would it be?",
-            "What’s a personal “win” (even tiny) that you want to celebrate?",
-            "What’s a hobby or interest you wish you had more time for?",
-            "What silly rule would you add to this campsite (our team)?",
-            "If you could teleport anywhere for a 10-minute break, where would it be?"
-        ];
+<div id="end-screen" class="screen hidden" style="justify-content: center; text-align: center;">
+<div style="font-size: 4rem; opacity: 0.5;">🌑</div>
+<h1>The Fire is Out</h1>
+<p>See you next sprint, team.</p>
+<button class="btn btn-secondary" onclick="location.reload()">Start New Session</button>
+</div>
 
-        // Simulate Data
-        const MOCK_LOCKED_DATA = [
-            { name: "Sarah", questionText: "What's a personal win?" },
-            { name: "Mike", questionText: "Teleport where?" },
-            { name: "Davina", questionText: "Book Title?" }
-        ];
+<script>
+// --- Data ---
+const ALL_QUESTIONS = [
+"What’s a small moment this week that warmed your heart?",
+"If you were to name the last 2 weeks like a book title, what would it be?",
+"If you could have one superpower just for work, what would it be?",
+"What’s a personal “win” (even tiny) that you want to celebrate?",
+"What’s a hobby or interest you wish you had more time for?",
+"What silly rule would you add to this campsite (our team)?",
+"If you could teleport anywhere for a 10-minute break, where would it be?"
+];
 
-        let currentUser = { name: "", role: "scout" };
-        let myQuestionText = "";
+// Simulate Data
+const MOCK_LOCKED_DATA = [
+{ name: "Sarah", questionText: "What's a personal win?" },
+{ name: "Mike", questionText: "Teleport where?" },
+{ name: "Davina", questionText: "Book Title?" }
+];
 
-        // --- Shared storage keys and in-memory structures ---
-        const STORAGE_KEYS = {
-            LOCKED_DATA: 'retro_locked_data_v1',
-            NOTES: 'retro_notes_v1'
-        };
+let currentUser = { name: "", role: "scout" };
+let myQuestionText = "";
 
-        // notesByColumn holds arrays of note objects for each column
-        // shape: { discover: [{id, text, author, timestamp, rot}], highlights: [...], ... }
-        let notesByColumn = {
-            discover: [],
-            highlights: [],
-            trip: [],
-            mvp: [],
-            pack: [],
-            ask: []
-        };
+// --- Shared storage keys and in-memory structures ---
+const STORAGE_KEYS = {
+LOCKED_DATA: 'retro_locked_data_v1',
+NOTES: 'retro_notes_v1'
+};
 
-        // Replace MOCK_LOCKED_DATA with a loadable shared array
-        function loadState() {
-            // load locked data
-            const lockedJson = localStorage.getItem(STORAGE_KEYS.LOCKED_DATA);
-            if (lockedJson) {
-                try {
-                    const parsed = JSON.parse(lockedJson);
-                    // ensure array
-                    if (Array.isArray(parsed)) {
-                        MOCK_LOCKED_DATA.length = 0;
-                        parsed.forEach(item => MOCK_LOCKED_DATA.push(item));
-                    }
-                } catch(e) { console.warn('Failed to parse locked data', e); }
-            }
+// notesByColumn holds arrays of note objects for each column
+// shape: { discover: [{id, text, author, timestamp, rot}], highlights: [...], ... }
+let notesByColumn = {
+discover: [],
+highlights: [],
+trip: [],
+mvp: [],
+pack: [],
+ask: []
+};
 
-            // load notes
-            const notesJson = localStorage.getItem(STORAGE_KEYS.NOTES);
-            if (notesJson) {
-                try {
-                    const parsed = JSON.parse(notesJson);
-                    if (parsed && typeof parsed === 'object') {
-                        Object.keys(notesByColumn).forEach(col => {
-                            notesByColumn[col] = Array.isArray(parsed[col]) ? parsed[col] : [];
-                        });
-                    }
-                } catch(e) { console.warn('Failed to parse notes', e); }
-            }
-        }
+// Storage event listener for real-time updates across tabs/windows
+let lockedQuestions = [];
 
-        function saveState() {
-            try {
-                localStorage.setItem(STORAGE_KEYS.LOCKED_DATA, JSON.stringify(MOCK_LOCKED_DATA));
-                localStorage.setItem(STORAGE_KEYS.NOTES, JSON.stringify(notesByColumn));
-            } catch(e) { console.warn('Failed to save state', e); }
-        }
+function loadState() {
+// load locked data
+const lockedJson = localStorage.getItem(STORAGE_KEYS.LOCKED_DATA);
+if (lockedJson) {
+try {
+const parsed = JSON.parse(lockedJson);
+// ensure array
+if (Array.isArray(parsed)) {
+lockedQuestions.length = 0;
+parsed.forEach(item => lockedQuestions.push(item));
+MOCK_LOCKED_DATA.length = 0;
+parsed.forEach(item => MOCK_LOCKED_DATA.push(item));
+}
+} catch(e) { console.warn('Failed to parse locked data', e); }
+}
 
-        // Render sticky notes from notesByColumn (shared board)
-        function renderNotes() {
-            Object.keys(notesByColumn).forEach(colId => {
-                const container = document.getElementById('notes-' + colId);
-                if (!container) return;
-                container.innerHTML = '';
-                notesByColumn[colId].forEach(noteObj => {
-                    const note = document.createElement('div');
-                    note.classList.add('sticky-note');
-                    note.innerText = noteObj.text;
-                    note.setAttribute('data-author', noteObj.author + ' • ' + new Date(noteObj.timestamp).toLocaleTimeString());
-                    note.style.transform = `rotate(${noteObj.rot}deg)`;
-                    container.appendChild(note);
-                });
-            });
-        }
+// load notes
+const notesJson = localStorage.getItem(STORAGE_KEYS.NOTES);
+if (notesJson) {
+try {
+const parsed = JSON.parse(notesJson);
+if (parsed && typeof parsed === 'object') {
+Object.keys(notesByColumn).forEach(col => {
+notesByColumn[col] = Array.isArray(parsed[col]) ? parsed[col] : [];
+});
+}
+} catch(e) { console.warn('Failed to parse notes', e); }
+}
+}
 
-        // Update lock logic to persist and broadcast
-        function lockQuestion() {
-            document.getElementById('lock-section').classList.add('hidden');
-            document.getElementById('post-lock-msg').classList.remove('hidden');
+// Listen for storage changes to update in real-time
+window.addEventListener('storage', function(e) {
+if (e.key === STORAGE_KEYS.LOCKED_DATA) {
+try {
+const newData = JSON.parse(e.newValue || '[]');
+lockedQuestions.length = 0;
+newData.forEach(item => lockedQuestions.push(item));
+MOCK_LOCKED_DATA.length = 0;
+newData.forEach(item => MOCK_LOCKED_DATA.push(item));
+renderLockedList();
+updateQuestionStats();
+} catch(err) {
+console.warn('Failed to sync locked data', err);
+}
+} else if (e.key === STORAGE_KEYS.NOTES) {
+try {
+const newNotes = JSON.parse(e.newValue || '{}');
+Object.keys(notesByColumn).forEach(col => {
+notesByColumn[col] = Array.isArray(newNotes[col]) ? newNotes[col] : [];
+});
+renderNotes();
+updateBoardStats();
+} catch(err) {
+console.warn('Failed to sync notes', err);
+}
+}
+});
 
-            const entry = { name: currentUser.name + " (You)", questionText: myQuestionText, timestamp: new Date().toISOString() };
-            MOCK_LOCKED_DATA.push(entry);
-            saveState();
-            renderLockedList();
-        }
+function saveState() {
+try {
+localStorage.setItem(STORAGE_KEYS.LOCKED_DATA, JSON.stringify(MOCK_LOCKED_DATA));
+localStorage.setItem(STORAGE_KEYS.NOTES, JSON.stringify(notesByColumn));
+// Trigger storage event for same-tab updates (since storage event doesn't fire in same tab)
+broadcastUpdate();
+} catch(e) { console.warn('Failed to save state', e); }
+}
 
-        // Persisting notes when added
-        function addNoteFromInput(colId) {
-            const col = document.getElementById('col-' + colId);
-            const input = col.querySelector('input');
-            const text = input.value.trim();
-            if (!text) return;
+// Broadcast updates to same tab
+function broadcastUpdate() {
+updateQuestionStats();
+updateBoardStats();
+}
 
-            const rot = Math.random() * 4 - 2;
-            const noteObj = {
-                id: 'note-' + Date.now(),
-                text,
-                author: currentUser.name || 'Anonymous',
-                timestamp: new Date().toISOString(),
-                rot
-            };
+// Update question statistics
+function updateQuestionStats() {
+const totalQuestions = MOCK_LOCKED_DATA.length;
+const uniqueUsers = new Set(MOCK_LOCKED_DATA.map(q => q.name.replace(' (You)', ''))).size;
+// Update stats display if it exists
+const statsEl = document.getElementById('question-stats');
+if (statsEl) {
+statsEl.innerHTML = `
+<div style="display: flex; gap: 20px; font-size: 0.9rem; color: var(--text-muted);">
+<span>📝 ${totalQuestions} Questions Locked</span>
+<span>👥 ${uniqueUsers} Participants</span>
+</div>
+`;
+}
+}
 
-            // add to shared column data and save
-            notesByColumn[colId].push(noteObj);
-            saveState();
+// Update board statistics
+function updateBoardStats() {
+const totalNotes = Object.values(notesByColumn).reduce((sum, notes) => sum + notes.length, 0);
+const contributors = new Set();
+Object.values(notesByColumn).forEach(notes => {
+notes.forEach(note => contributors.add(note.author));
+});
 
-            // render updated notes for everyone
-            renderNotes();
+const statsEl = document.getElementById('board-stats');
+if (statsEl) {
+statsEl.innerHTML = `
+<div style="display: flex; gap: 20px; font-size: 0.9rem; color: var(--text-muted);">
+<span>📌 ${totalNotes} Total Notes</span>
+<span>✍️ ${contributors.size} Contributors</span>
+</div>
+`;
+}
+}
 
-            input.value = "";
-        }
+// Render sticky notes from notesByColumn (shared board)
+function renderNotes() {
+Object.keys(notesByColumn).forEach(colId => {
+const container = document.getElementById('notes-' + colId);
+if (!container) return;
+container.innerHTML = '';
+notesByColumn[colId].forEach(noteObj => {
+const note = document.createElement('div');
+note.classList.add('sticky-note');
+note.innerText = noteObj.text;
+note.setAttribute('data-author', noteObj.author + ' • ' + new Date(noteObj.timestamp).toLocaleTimeString());
+note.style.transform = `rotate(${noteObj.rot}deg)`;
+container.appendChild(note);
+});
+});
+}
 
-        // Render locked list using stored data
-        function renderLockedList() {
-            const list = document.getElementById('admin-list');
-            list.innerHTML = "";
-            // sort by timestamp (oldest first)
-            const copy = MOCK_LOCKED_DATA.slice().sort((a,b) => new Date(a.timestamp) - new Date(b.timestamp));
-            if (copy.length === 0) {
-                list.innerHTML = `<p style="color: var(--text-muted); font-style: italic;">Waiting for team...</p>`;
-                return;
-            }
-            copy.forEach(data => {
-                const entry = document.createElement('div');
-                const isMe = data.name.includes('(You)');
-                const borderColor = isMe ? '#22c55e' : '#f97316';
-                entry.innerHTML = `
-                    <div style="margin-bottom: 10px; padding: 12px; background: #0f172a; border-left: 3px solid ${borderColor}; border-radius: 4px;">
-                        <div style="display:flex; justify-content:space-between;">
-                            <strong style="color: #f1f5f9;">${data.name}</strong>
-                            <span style="font-size:0.7rem; background: #334155; padding: 2px 6px; border-radius: 4px; color: #94a3b8;">LOCKED</span>
-                        </div>
-                        <div style="margin-top: 5px; color: ${isMe ? '#86efac' : '#cbd5e1'}; font-size: 0.95rem;">
-                            ${data.questionText}
-                        </div>
-                        <div style="margin-top:6px; font-size:0.75rem; color:#64748b;">${new Date(data.timestamp).toLocaleString()}</div>
-                    </div>
-                `;
-                list.appendChild(entry);
-            });
-        }
+// Update lock logic to persist and broadcast
+function lockQuestion() {
+document.getElementById('lock-section').classList.add('hidden');
+document.getElementById('post-lock-msg').classList.remove('hidden');
 
-        function goToRetro() {
-            switchScreen('retro-screen');
-        }
+const entry = { name: currentUser.name + " (You)", questionText: myQuestionText, timestamp: new Date().toISOString() };
+MOCK_LOCKED_DATA.push(entry);
+saveState();
+renderLockedList();
+}
 
-        // On app start, load shared state and render
-        document.addEventListener('DOMContentLoaded', function() {
-            loadState();
-            renderNotes();
-            renderLockedList();
+// Persisting notes when added
+function addNoteFromInput(colId) {
+const col = document.getElementById('col-' + colId);
+const input = col.querySelector('input');
+const text = input.value.trim();
+if (!text) return;
 
-            // restore display-name if previously set in session
-            const savedName = sessionStorage.getItem('retro_name');
-            if (savedName) {
-                currentUser.name = savedName;
-                document.getElementById('display-name').textContent = currentUser.name;
-            }
-        });
+const rot = Math.random() * 4 - 2;
+const noteObj = {
+id: 'note-' + Date.now(),
+text,
+author: currentUser.name || 'Anonymous',
+timestamp: new Date().toISOString(),
+rot
+};
 
-        // save user name to session when joining camp
-        document.getElementById('login-form').addEventListener('submit', function(e) {
-            e.preventDefault();
-            const nameInput = document.getElementById('username-input').value.trim();
-            if(!nameInput) return;
-            currentUser.name = nameInput;
-            sessionStorage.setItem('retro_name', currentUser.name);
-            if (currentUser.name.toLowerCase() === 'camp leader') {
-                currentUser.role = 'leader';
-                document.getElementById('download-btn-ice').classList.remove('hidden');
-                document.getElementById('download-btn-retro').classList.remove('hidden');
-            }
-            document.getElementById('display-name').textContent = currentUser.name;
-            document.getElementById('display-role').textContent = currentUser.role.toUpperCase();
-            switchScreen('icebreaker-screen');
-            renderLockedList();
-        });
+// add to shared column data and save
+notesByColumn[colId].push(noteObj);
+saveState();
 
-        // 1. Login
-        document.getElementById('login-form').addEventListener('submit', function(e) {
-            e.preventDefault();
-            const nameInput = document.getElementById('username-input').value.trim();
-            if(!nameInput) return;
+// render updated notes for everyone
+renderNotes();
 
-            currentUser.name = nameInput;
-            
-            if (currentUser.name.toLowerCase() === 'camp leader') {
-                currentUser.role = 'leader';
-                document.getElementById('download-btn-ice').classList.remove('hidden');
-                document.getElementById('download-btn-retro').classList.remove('hidden');
-            }
+input.value = "";
+}
 
-            document.getElementById('display-name').textContent = currentUser.name;
-            document.getElementById('display-role').textContent = currentUser.role.toUpperCase();
 
-            switchScreen('icebreaker-screen');
-            renderLockedList();
-        });
 
-        function switchScreen(screenId) {
-            document.querySelectorAll('.screen').forEach(s => s.classList.add('hidden'));
-            document.getElementById(screenId).classList.remove('hidden');
-        }
 
-        // 2. Smart Spin Logic
-        function spinWheel() {
-            const wheel = document.getElementById('wheel-visual');
-            const btn = document.getElementById('spin-btn');
-            const display = document.getElementById('question-display');
+function switchScreen(screenId) {
+document.querySelectorAll('.screen').forEach(s => s.classList.add('hidden'));
+document.getElementById(screenId).classList.remove('hidden');
+}
 
-            btn.disabled = true;
-            btn.innerText = "Spinning...";
-            wheel.classList.add('spinning');
-            display.classList.add('hidden');
+// 2. Smart Spin Logic
+function spinWheel() {
+const wheel = document.getElementById('wheel-visual');
+const btn = document.getElementById('spin-btn');
+const display = document.getElementById('question-display');
 
-            setTimeout(() => {
-                wheel.classList.remove('spinning');
-                
-                // Filtering Logic
-                const takenTexts = MOCK_LOCKED_DATA.map(u => u.questionText);
-                const availableQuestions = ALL_QUESTIONS.filter(q => !takenTexts.includes(q));
+btn.disabled = true;
+btn.innerText = "Spinning...";
+wheel.classList.add('spinning');
+display.classList.add('hidden');
 
-                if(availableQuestions.length > 0) {
-                    const randomIndex = Math.floor(Math.random() * availableQuestions.length);
-                    myQuestionText = availableQuestions[randomIndex];
-                } else {
-                    myQuestionText = ALL_QUESTIONS[Math.floor(Math.random() * ALL_QUESTIONS.length)];
-                }
-                
-                display.innerText = myQuestionText;
-                display.classList.remove('hidden');
-                
-                document.getElementById('spin-controls').classList.add('hidden');
-                document.getElementById('lock-section').classList.remove('hidden');
-            }, 1500);
-        }
+setTimeout(() => {
+wheel.classList.remove('spinning');
+// Filtering Logic
+const takenTexts = MOCK_LOCKED_DATA.map(u => u.questionText);
+const availableQuestions = ALL_QUESTIONS.filter(q => !takenTexts.includes(q));
 
-        // 3. Lock Question Logic
-        function lockQuestion() {
-            document.getElementById('lock-section').classList.add('hidden');
-            document.getElementById('post-lock-msg').classList.remove('hidden');
+if(availableQuestions.length > 0) {
+const randomIndex = Math.floor(Math.random() * availableQuestions.length);
+myQuestionText = availableQuestions[randomIndex];
+} else {
+myQuestionText = ALL_QUESTIONS[Math.floor(Math.random() * ALL_QUESTIONS.length)];
+}
+display.innerText = myQuestionText;
+display.classList.remove('hidden');
+document.getElementById('spin-controls').classList.add('hidden');
+document.getElementById('lock-section').classList.remove('hidden');
+}, 1500);
+}
 
-            const entry = { name: currentUser.name + " (You)", questionText: myQuestionText, timestamp: new Date().toISOString() };
-            MOCK_LOCKED_DATA.push(entry);
-            saveState();
-            renderLockedList();
-        }
+// 3. Lock Question Logic
+function lockQuestion() {
+document.getElementById('lock-section').classList.add('hidden');
+document.getElementById('post-lock-msg').classList.remove('hidden');
 
-        function renderLockedList() {
-            const list = document.getElementById('admin-list');
-            list.innerHTML = "";
-            // sort by timestamp (oldest first)
-            const copy = MOCK_LOCKED_DATA.slice().sort((a,b) => new Date(a.timestamp) - new Date(b.timestamp));
-            if (copy.length === 0) {
-                list.innerHTML = `<p style="color: var(--text-muted); font-style: italic;">Waiting for team...</p>`;
-                return;
-            }
-            copy.forEach(data => {
-                const entry = document.createElement('div');
-                const isMe = data.name.includes('(You)');
-                const borderColor = isMe ? '#22c55e' : '#f97316';
+const entry = { name: currentUser.name + " (You)", questionText: myQuestionText, timestamp: new Date().toISOString() };
+MOCK_LOCKED_DATA.push(entry);
+saveState();
+renderLockedList();
+}
 
-                entry.innerHTML = `
-                    <div style="margin-bottom: 10px; padding: 12px; background: #0f172a; border-left: 3px solid ${borderColor}; border-radius: 4px;">
-                        <div style="display:flex; justify-content:space-between;">
-                            <strong style="color: #f1f5f9;">${data.name}</strong>
-                            <span style="font-size:0.7rem; background: #334155; padding: 2px 6px; border-radius: 4px; color: #94a3b8;">LOCKED</span>
-                        </div>
-                        <div style="margin-top: 5px; color: ${isMe ? '#86efac' : '#cbd5e1'}; font-size: 0.95rem;">
-                            ${data.questionText}
-                        </div>
-                        <div style="margin-top:6px; font-size:0.75rem; color:#64748b;">${new Date(data.timestamp).toLocaleString()}</div>
-                    </div>
-                `;
-                list.appendChild(entry);
-            });
-        }
+function renderLockedList() {
+const list = document.getElementById('admin-list');
+const allQuestionsSection = document.getElementById('all-questions-section');
+if (currentUser.role !== 'leader') {
+list.innerHTML = `<div style="text-align:center; padding: 40px; color: #64748b;">
+<div style="font-size: 2rem;">�</div>
+<p>You can see <strong>your own locked question</strong> below when you lock one!</p>
+<div style="margin-top: 15px; font-size: 0.85rem;">
+Only the <strong>Camp Leader</strong> can see everyone's questions.
+</div>
+</div>`;
+// Show user's own questions
+const myQuestions = MOCK_LOCKED_DATA.filter(q => q.name.includes('(You)'));
+if (myQuestions.length > 0) {
+myQuestions.forEach(data => {
+const entry = document.createElement('div');
+entry.innerHTML = `
+<div style="margin: 10px 0; padding: 12px; background: #0f172a; border-left: 3px solid #22c55e; border-radius: 4px;">
+<div style="display:flex; justify-content:space-between;">
+<strong style="color: #86efac;">Your Question</strong>
+<span style="font-size:0.7rem; background: #22c55e; color: #052e16; padding: 2px 6px; border-radius: 4px;">LOCKED ✓</span>
+</div>
+<div style="margin-top: 5px; color: #86efac; font-size: 0.95rem;">
+${data.questionText}
+</div>
+<div style="margin-top:6px; font-size:0.75rem; color:#64748b;">${new Date(data.timestamp).toLocaleString()}</div>
+</div>
+`;
+list.appendChild(entry);
+});
+}
+if (allQuestionsSection) allQuestionsSection.classList.add('hidden');
+return;
+}
 
-        function goToRetro() {
-            switchScreen('retro-screen');
-        }
+// Admin view - show all questions
+list.innerHTML = "";
+if (MOCK_LOCKED_DATA.length === 0) {
+list.innerHTML = `<div style="text-align:center; padding: 20px; color: #64748b;">
+<div style="font-size: 1.5rem;">⏳</div>
+<p>Waiting for team members to lock their questions...</p>
+</div>`;
+} else {
+// sort by timestamp (oldest first)
+const copy = MOCK_LOCKED_DATA.slice().sort((a,b) => new Date(a.timestamp) - new Date(b.timestamp));
+copy.forEach((data, index) => {
+const entry = document.createElement('div');
+const isMe = data.name.includes('(You)');
+const borderColor = isMe ? '#22c55e' : '#f97316';
+const orderNumber = index + 1;
 
-        // 4. Retro Board Logic
-        function handleNoteKey(event, colId) {
-            if (event.key === 'Enter') addNoteFromInput(colId);
-        }
+entry.innerHTML = `
+<div style="margin-bottom: 10px; padding: 12px; background: #0f172a; border-left: 3px solid ${borderColor}; border-radius: 4px; position: relative;">
+<div style="position: absolute; top: 5px; right: 8px; background: ${borderColor}; color: ${isMe ? '#052e16' : 'white'}; width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; font-weight: bold;">
+${orderNumber}
+</div>
+<div style="display:flex; justify-content:space-between; padding-right: 30px;">
+<strong style="color: #f1f5f9;">${data.name}</strong>
+<span style="font-size:0.7rem; background: #334155; padding: 2px 6px; border-radius: 4px; color: #94a3b8;">LOCKED</span>
+</div>
+<div style="margin-top: 5px; color: ${isMe ? '#86efac' : '#cbd5e1'}; font-size: 0.95rem;">
+${data.questionText}
+</div>
+<div style="margin-top:6px; font-size:0.75rem; color:#64748b;">${new Date(data.timestamp).toLocaleString()}</div>
+</div>
+`;
+list.appendChild(entry);
+});
+}
 
-        function addNoteFromInput(colId) {
-            const col = document.getElementById('col-' + colId);
-            const input = col.querySelector('input');
-            const text = input.value.trim();
-            
-            if (!text) return;
+// Show all available questions for admin
+if (allQuestionsSection) {
+allQuestionsSection.classList.remove('hidden');
+renderAllQuestionsList();
+}
+}
 
-            const rot = Math.random() * 4 - 2;
-            const noteObj = {
-                id: 'note-' + Date.now(),
-                text,
-                author: currentUser.name || 'Anonymous',
-                timestamp: new Date().toISOString(),
-                rot
-            };
+function renderAllQuestionsList() {
+const allQuestionsList = document.getElementById('all-questions-list');
+if (!allQuestionsList) return;
 
-            // add to shared column data and save
-            notesByColumn[colId].push(noteObj);
-            saveState();
+const takenTexts = MOCK_LOCKED_DATA.map(u => u.questionText);
+allQuestionsList.innerHTML = '';
+ALL_QUESTIONS.forEach((question, index) => {
+const isUsed = takenTexts.includes(question);
+const questionDiv = document.createElement('div');
+questionDiv.innerHTML = `
+<div style="padding: 8px; margin-bottom: 5px; background: ${isUsed ? 'rgba(239, 68, 68, 0.1)' : 'rgba(34, 197, 94, 0.1)'}; border-radius: 4px; border-left: 3px solid ${isUsed ? '#ef4444' : '#22c55e'};">
+<div style="display: flex; justify-content: between; align-items: flex-start;">
+<span style="color: ${isUsed ? '#fca5a5' : '#86efac'}; flex: 1;">${question}</span>
+<span style="font-size: 0.7rem; padding: 2px 6px; border-radius: 10px; background: ${isUsed ? '#ef4444' : '#22c55e'}; color: ${isUsed ? 'white' : '#052e16'}; margin-left: 10px; white-space: nowrap;">
+${isUsed ? 'USED' : 'AVAILABLE'}
+</span>
+</div>
+${isUsed ? `<div style="font-size: 0.7rem; color: #64748b; margin-top: 3px;">Used by: ${MOCK_LOCKED_DATA.find(q => q.questionText === question)?.name.replace(' (You)', '') || 'Unknown'}</div>` : ''}
+</div>
+`;
+allQuestionsList.appendChild(questionDiv);
+});
+}
 
-            // render updated notes for everyone
-            renderNotes();
+function goToRetro() {
+switchScreen('retro-screen');
+}
 
-            input.value = "";
-        }
+// 4. Retro Board Logic
+function handleNoteKey(event, colId) {
+if (event.key === 'Enter') addNoteFromInput(colId);
+}
 
-        // 5. Download
-        function downloadView(elementId) {
-            const element = document.getElementById(elementId);
-            html2canvas(element, { backgroundColor: "#1e293b" }).then(canvas => {
-                const link = document.createElement('a');
-                link.download = 'campfire-log.png';
-                link.href = canvas.toDataURL();
-                link.click();
-            });
-        }
+function addNoteFromInput(colId) {
+const col = document.getElementById('col-' + colId);
+const input = col.querySelector('input');
+const text = input.value.trim();
+if (!text) return;
 
-        function endSession() {
-            switchScreen('end-screen');
-        }
+const rot = Math.random() * 4 - 2;
+const noteObj = {
+id: 'note-' + Date.now(),
+text,
+author: currentUser.name || 'Anonymous',
+timestamp: new Date().toISOString(),
+rot
+};
 
-        // On app start, load shared state and render
-        document.addEventListener('DOMContentLoaded', function() {
-            loadState();
-            renderNotes();
-            renderLockedList();
+// add to shared column data and save
+notesByColumn[colId].push(noteObj);
+saveState();
 
-            // restore display-name if previously set in session
-            const savedName = sessionStorage.getItem('retro_name');
-            if (savedName) {
-                currentUser.name = savedName;
-                document.getElementById('display-name').textContent = currentUser.name;
-            }
-        });
+// render updated notes for everyone
+renderNotes();
 
-        // save user name to session when joining camp
-        document.getElementById('login-form').addEventListener('submit', function(e) {
-            e.preventDefault();
-            const nameInput = document.getElementById('username-input').value.trim();
-            if(!nameInput) return;
-            currentUser.name = nameInput;
-            sessionStorage.setItem('retro_name', currentUser.name);
-            if (currentUser.name.toLowerCase() === 'camp leader') {
-                currentUser.role = 'leader';
-                document.getElementById('download-btn-ice').classList.remove('hidden');
-                document.getElementById('download-btn-retro').classList.remove('hidden');
-            }
-            document.getElementById('display-name').textContent = currentUser.name;
-            document.getElementById('display-role').textContent = currentUser.role.toUpperCase();
-            switchScreen('icebreaker-screen');
-            renderLockedList();
-        });
-    </script>
+input.value = "";
+}
+
+// 5. Download
+function downloadView(elementId) {
+const element = document.getElementById(elementId);
+html2canvas(element, { backgroundColor: "#1e293b" }).then(canvas => {
+const link = document.createElement('a');
+link.download = 'campfire-log.png';
+link.href = canvas.toDataURL();
+link.click();
+});
+}
+
+function endSession() {
+switchScreen('end-screen');
+}
+
+// On app start, load shared state and render
+document.addEventListener('DOMContentLoaded', function() {
+loadState();
+renderNotes();
+renderLockedList();
+updateQuestionStats();
+updateBoardStats();
+
+// restore display-name if previously set in session
+const savedName = sessionStorage.getItem('retro_name');
+if (savedName) {
+currentUser.name = savedName;
+document.getElementById('display-name').textContent = currentUser.name;
+// check if leader role
+if (currentUser.name.toLowerCase() === 'camp leader') {
+currentUser.role = 'leader';
+document.getElementById('download-btn-ice').classList.remove('hidden');
+document.getElementById('download-btn-retro').classList.remove('hidden');
+}
+document.getElementById('display-role').textContent = currentUser.role.toUpperCase();
+}
+});
+
+// save user name to session when joining camp
+document.getElementById('login-form').addEventListener('submit', function(e) {
+e.preventDefault();
+const nameInput = document.getElementById('username-input').value.trim();
+if(!nameInput) return;
+currentUser.name = nameInput;
+sessionStorage.setItem('retro_name', currentUser.name);
+if (currentUser.name.toLowerCase() === 'camp leader') {
+currentUser.role = 'leader';
+document.getElementById('download-btn-ice').classList.remove('hidden');
+document.getElementById('download-btn-retro').classList.remove('hidden');
+}
+document.getElementById('display-name').textContent = currentUser.name;
+document.getElementById('display-role').textContent = currentUser.role.toUpperCase();
+switchScreen('icebreaker-screen');
+renderLockedList();
+});
+</script>
 </body>
 </html>
+
+
+
+Get Outlook for Mac 
