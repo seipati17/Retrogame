@@ -506,22 +506,17 @@
         // Render locked list using stored data
         function renderLockedList() {
             const list = document.getElementById('admin-list');
-            if (currentUser.role !== 'leader') {
-                list.innerHTML = `<div style="text-align:center; padding: 40px; color: #64748b;">
-                    <div style="font-size: 2rem;">🕵️</div>
-                    <p>Only the <strong>Camp Leader</strong> can see the locked question list.</p>
-                </div>`;
-                return;
-            }
-
             list.innerHTML = "";
             // sort by timestamp (oldest first)
             const copy = MOCK_LOCKED_DATA.slice().sort((a,b) => new Date(a.timestamp) - new Date(b.timestamp));
+            if (copy.length === 0) {
+                list.innerHTML = `<p style="color: var(--text-muted); font-style: italic;">Waiting for team...</p>`;
+                return;
+            }
             copy.forEach(data => {
                 const entry = document.createElement('div');
                 const isMe = data.name.includes('(You)');
                 const borderColor = isMe ? '#22c55e' : '#f97316';
-
                 entry.innerHTML = `
                     <div style="margin-bottom: 10px; padding: 12px; background: #0f172a; border-left: 3px solid ${borderColor}; border-radius: 4px;">
                         <div style="display:flex; justify-content:space-between;">
@@ -536,6 +531,10 @@
                 `;
                 list.appendChild(entry);
             });
+        }
+
+        function goToRetro() {
+            switchScreen('retro-screen');
         }
 
         // On app start, load shared state and render
@@ -642,17 +641,13 @@
 
         function renderLockedList() {
             const list = document.getElementById('admin-list');
-            if (currentUser.role !== 'leader') {
-                list.innerHTML = `<div style="text-align:center; padding: 40px; color: #64748b;">
-                    <div style="font-size: 2rem;">🕵️</div>
-                    <p>Only the <strong>Camp Leader</strong> can see the locked question list.</p>
-                </div>`;
-                return;
-            }
-
             list.innerHTML = "";
             // sort by timestamp (oldest first)
             const copy = MOCK_LOCKED_DATA.slice().sort((a,b) => new Date(a.timestamp) - new Date(b.timestamp));
+            if (copy.length === 0) {
+                list.innerHTML = `<p style="color: var(--text-muted); font-style: italic;">Waiting for team...</p>`;
+                return;
+            }
             copy.forEach(data => {
                 const entry = document.createElement('div');
                 const isMe = data.name.includes('(You)');
